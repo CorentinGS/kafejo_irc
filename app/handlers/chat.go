@@ -9,6 +9,7 @@ import (
 	"sync/atomic"
 	"time"
 
+	"github.com/a-h/templ"
 	"github.com/corentings/kafejo-books/app/views/page"
 	"github.com/corentings/kafejo-books/domain"
 )
@@ -59,8 +60,12 @@ func (c *ChatHandler) HandleGetChatLive() http.HandlerFunc {
 		for {
 			select {
 			case message := <-messageChan:
-				// Use the username when creating the message component
-				messageComponent := page.Message(message.Author, message.Content)
+				var messageComponent templ.Component
+				if message.Author == "Server" {
+					messageComponent = page.ServerMessage(message.Content)
+				} else {
+					messageComponent = page.Message(message.Author, message.Content)
+				}
 
 				// Create a buffer to render the component
 				buf := &bytes.Buffer{}
@@ -145,6 +150,14 @@ func (c *ChatHandler) addClient(username string, messageChan chan domain.Message
 	if _, exists := c.clients[username]; !exists {
 		c.clients[username] = messageChan
 		atomic.AddInt64(&c.userCount, 1)
+
+		go func() {
+			message := domain.Message{
+				Author:  "Server",
+				Content: fmt.Sprintf("%s has joined the chat", username),
+			}
+			c.broadcastMessage(message)
+		}()
 	}
 }
 
@@ -155,6 +168,14 @@ func (c *ChatHandler) removeClient(username string) {
 		close(c.clients[username])
 		delete(c.clients, username)
 		atomic.AddInt64(&c.userCount, -1)
+
+		go func() {
+			message := domain.Message{
+				Author:  "Server",
+				Content: fmt.Sprintf("%s has left the chat", username),
+			}
+			c.broadcastMessage(message)
+		}()
 	}
 }
 

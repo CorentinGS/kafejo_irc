@@ -9,6 +9,10 @@ templ Message(username, message string) {
 	<p>{ username }: { templ.EscapeString(message) }</p>
 }
 
+templ ServerMessage(message string) {
+    <p><ins>Server: { templ.EscapeString(message) }</ins></p>
+}
+
 templ App() {
 	<section class="container" hx-ext="sse" sse-connect="/chat/live">
 		<style>
