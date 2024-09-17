@@ -57,6 +57,8 @@ func RegisterRoutes(s *Server) {
 
 	r.Post("/chat/send", chatHandler.HandlePostChatSend())
 
+	r.Get("/chat/users", chatHandler.HandleGetUserCount())
+
 	r.Get("/robots.txt", func(w http.ResponseWriter, _ *http.Request) {
 		_, err := w.Write(assets.RobotsTxt())
 		if err != nil {
