@@ -1,3 +1,9 @@
+## 0.0.6 (2024-09-17)
+
+### ✨ Features
+
+- add user count and username
+
 ## 0.0.5 (2024-09-17)
 
 ### ✨ Features
