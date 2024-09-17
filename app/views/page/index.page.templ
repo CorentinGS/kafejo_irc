@@ -3,52 +3,31 @@ package page
 import "github.com/corentings/kafejo-books/app/views/layout"
 
 templ Hero() {
-	<section>
-		<style>
-	me {
-		padding: auto;
-		margin: auto;
-  		height: 100vh;
-		text-align: center;
-		display: flex;
-		flex-direction: column;
-		justify-content: center;
-		align-items: center;
-	}
-	</style>
-		<h1>The Kafejo Library</h1>
-		<p>A website with a lot of great resources to improve at coding and read for free books.</p>
+	<section class="container">
+
+		<h1>The Kafejo IRC</h1>
+		<p>A very simple, yet powerful IRC server using non mature technologies such as Golang and NoSQL.</p>
+		<p> But hopefully, it uses HTMX and Hyperscript so it's blazingly fast and robust.</p>
 		<span>Made by <a href="https://corentings.dev">CorentinGS</a></span>
+	</section>
+}
+
+templ Login() {
+	<section class="container">
+		<h1>Login</h1>
+		<form>
+			<input type="password" name="password" placeholder="Password"/>
+			<small>Password is <code>password</code></small>
+			<button type="submit">Login</button>
+		</form>
+
 	</section>
 }
 
 templ Index() {
 	@Hero()
-	// Lazy load the books
-	<div hx-get="/books" hx-trigger="load delay:1s">
-		<style>
-		me {
-			min-height: 50vh;
-			margin: 0 auto;
-			display: flex;
-			justify-content: center;
-			align-items: center;
-		}
-	</style>
-		@SkChaseLoader()
-	</div>
-	<style>
-	me section {
-		height: 100vh;
-    	padding: 20px;
-    	border-bottom: 1px solid #ccc;
-	}
-	</style>
-	<section id="section1" class="full-height">Section 1 Content</section>
-    <section id="section2" class="full-height">Section 2 Content</section>
-    <section id="section3" class="full-height">Section 3 Content</section>
-    <section id="section4" class="full-height">Section 4 Content</section>
-	// Load the book
+	@Login()
+
 }
 
 templ SkChaseLoader() {

@@ -16,6 +16,8 @@ import (
 func RegisterRoutes(s *Server) {
 	pageHandler := handlers.NewPageHandler()
 	bookHandler := handlers.NewBookHandler()
+	chatHandler := handlers.NewChatHandler()
+
 	r := s.Router
 
 	if s.Config.Level == "debug" {
@@ -49,10 +51,12 @@ func RegisterRoutes(s *Server) {
 	r.Get("/", pageHandler.HandleGetIndex())
 
 	r.Get("/books", bookHandler.HandleGetBooks())
-	r.Get("/book", bookHandler.HandleGetIndex())
-	r.Get("/book/LoremIpsum/{page}", bookHandler.HandleGetLoremIpsum())
 
-	r.Get(("/books/{book}"), bookHandler.HandleGetBook())
+	r.Get("/chat", pageHandler.HandleGetChat())
+
+	r.Get("/chat/live", chatHandler.HandleGetChatLive())
+
+	r.Post("/chat/send", chatHandler.HandlePostChatSend())
 
 	r.Get("/robots.txt", func(w http.ResponseWriter, _ *http.Request) {
 		_, err := w.Write(assets.RobotsTxt())
@@ -91,7 +95,7 @@ func StaticPageCacheControlMiddleware(next http.Handler) http.Handler {
 func CSPMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// Set Content-Security-Policy header
-		cspHeader := "default-src 'self'; connect-src 'self' *.corentings.dev ; script-src 'self' *.corentings.dev ; style-src 'self' 'unsafe-inline'"
+		cspHeader := "default-src 'self'; connect-src 'self' *.corentings.dev ; script-src 'self' *.corentings.dev ; style-src 'self' 'unsafe-inline' cdn.jsdelivr.net cdn.simplecss.org"
 
 		w.Header().Set("Content-Security-Policy", cspHeader)
 

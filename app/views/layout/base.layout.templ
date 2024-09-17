@@ -13,22 +13,36 @@ templ Base(title string) {
 			/>
 			<meta name="htmx-config" content='{"selfRequestsOnly":"true"}'/>
 			<meta name="google" content="notranslate"/>
-			<link rel="stylesheet" href="/static/css/normalize.min.css"/>
-			<script src="/static/js/sakura.min.js"></script>
+			<link
+				rel="stylesheet"
+				href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.grey.min.css"
+			/>
 			<script src="/static/js/css-scope-inline.min.js"></script>
 			<script src="/static/js/htmx.min.js" defer></script>
 			<script src="/static/js/hyperscript.min.js" defer></script>
 			<script src="/static/js/preload.min.js" defer></script>
+			<script src="/static/js/sse.min.js" defer></script>
 			<link rel="stylesheet" href="/static/css/sk-chase.min.css"/>
-			<script defer src="https://nero.corentings.dev/script.js" data-domains="kafejo.corentings.dev" data-website-id="d35cf846-5a89-4611-82e4-070c4f5bf61d"></script>
+			<script defer src="https://nero.corentings.dev/script.js" data-domains="irc.corentings.dev"></script>
 			// Favicon
 			<link rel="icon" href="/static/img/favicon.ico" type="image/x-icon"/>
+			<style>
+				body {
+					--pico-font-family-sans-serif: Seravek, 'Gill Sans Nova', Ubuntu, Calibri, 'DejaVu Sans', source-sans-pro, sans-serif;
+					--pico-font-family: Seravek, 'Gill Sans Nova', Ubuntu, Calibri, 'DejaVu Sans', source-sans-pro, sans-serif;
+					--pico-font-family-monospace: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace;
+					font-family: var(--pico-font-family);
+
+					h1, h2, h3, h4, h5, h6 {
+						--pico-font-family: Inter, Roboto, 'Helvetica Neue', 'Arial Nova', 'Nimbus Sans', Arial, sans-serif;
+					}
+				}
+			</style>
 		</head>
 		<body class="sample-transition" hx-ext="preload">
 			<main class={  }>
 				{ children... }
 			</main>
-			<footer></footer>
 		</body>
 	</html>
 }

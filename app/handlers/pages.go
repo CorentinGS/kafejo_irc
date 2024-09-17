@@ -24,3 +24,15 @@ func (p *PageHandler) HandleGetIndex() http.HandlerFunc {
 		}
 	}
 }
+
+func (p *PageHandler) HandleGetChat() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		hero := page.Chat()
+
+		chat := page.ChatPage("Kafejo Chat", hero)
+
+		if err := Render(w, r, http.StatusOK, chat); err != nil {
+			slog.ErrorContext(r.Context(), "error rendering chat page", slog.String("error", err.Error()))
+		}
+	}
+}

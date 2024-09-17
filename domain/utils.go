@@ -26,3 +26,8 @@ type Nonce struct {
 	UmamiNonce          string
 	CSSScopeInlineNonce string
 }
+
+type Message struct {
+	author  string
+	content string
+}

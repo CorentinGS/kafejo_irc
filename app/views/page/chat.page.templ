@@ -1,0 +1,53 @@
+package page
+
+import "github.com/corentings/kafejo-books/app/views/layout"
+
+templ Message(message string) {
+	<p>{ message }</p>
+}
+
+templ App() {
+	<section class="container">
+		<style>
+    me {
+        height: 100%;
+    }
+    </style>
+		<h1>Kafejo Chat</h1>
+		<div class="overflow-auto">
+			<style>
+        me {
+            height: 75vh;
+        }
+        </style>
+			<div hx-ext="sse" sse-connect="/chat/live">
+				<div id="chat" sse-swap="chat" hx-swap="beforeend" hx-on::after-settle="this.scrollTo(0, this.scrollHeight);"></div>
+			</div>
+		</div>
+		@ChatInput()
+	</section>
+}
+
+templ ChatInput() {
+	<form hx-post="/chat/send">
+		<fieldset role="group">
+			<input
+				type="text"
+				name="message"
+				placeholder="Enter your message"
+			/>
+			<input type="submit" value="Send"/>
+		</fieldset>
+	</form>
+}
+
+templ Chat() {
+	@App()
+}
+
+templ ChatPage(title string,
+	cmp templ.Component) {
+	@layout.Base(title) {
+		@cmp
+	}
+}
