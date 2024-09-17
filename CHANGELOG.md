@@ -1,3 +1,9 @@
+## 0.0.5 (2024-09-17)
+
+### ✨ Features
+
+- number of connecter users and fix some bugs
+
 ## 0.0.4 (2024-09-17)
 
 ### ✨ Features
