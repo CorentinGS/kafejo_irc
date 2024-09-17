@@ -1,0 +1,48 @@
+version: "3"
+
+env:
+  PORT: 8080
+  APP_ENV: dev
+
+tasks:
+  dev:
+    run: always
+    cmds:
+      - air
+  commit:
+    cmds:
+      - git add -A
+      - cz --name cz_gitmoji commit
+  lint:
+    cmds:
+      - go mod tidy
+      - gofumpt -l -w .
+      - betteralign -apply ./...
+      - gci write -s standard -s default  --skip-generated  .
+      - golangci-lint run
+      - go test -cover ./...
+  build:
+    deps:
+      - task: generate
+    cmds:
+      - go build -tags dev -o build/memnix ./cmd/http/main.go
+  clean:
+    cmds:
+      - rm -rf build
+  generate:
+    aliases:
+      - gen
+      - g
+    generates:
+      - app/views/**/*.go
+      - assets/css/*.css
+      - assets/js/*.js
+    sources:
+      - app/views/**/*.templ
+      - assets/css/*.css
+      - assets/js/*.js
+    cmds:
+      - templ generate
+      - go generate -tags dev ./...
+      - ./minify.sh assets/css
+      - ./minify.sh assets/js
