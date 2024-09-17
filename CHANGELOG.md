@@ -1,3 +1,9 @@
+## 0.0.7 (2024-09-18)
+
+### ✨ Features
+
+- add system messages
+
 ## 0.0.6 (2024-09-17)
 
 ### ✨ Features

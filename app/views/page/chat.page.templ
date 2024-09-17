@@ -10,7 +10,7 @@ templ Message(username, message string) {
 }
 
 templ ServerMessage(message string) {
-    <p><ins>Server: { templ.EscapeString(message) }</ins></p>
+	<p><ins>Server: { templ.EscapeString(message) }</ins></p>
 }
 
 templ App() {
