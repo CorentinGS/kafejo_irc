@@ -15,7 +15,6 @@ import (
 // RegisterRoutes registers the API routes for the repertoire service.
 func RegisterRoutes(s *Server) {
 	pageHandler := handlers.NewPageHandler()
-	bookHandler := handlers.NewBookHandler()
 	chatHandler := handlers.NewChatHandler()
 
 	r := s.Router
@@ -50,7 +49,7 @@ func RegisterRoutes(s *Server) {
 
 	r.Get("/", pageHandler.HandleGetIndex())
 
-	r.Get("/books", bookHandler.HandleGetBooks())
+	r.Post("/login", pageHandler.HandleGetLogin())
 
 	r.Get("/chat", pageHandler.HandleGetChat())
 

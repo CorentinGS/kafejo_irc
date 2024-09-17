@@ -60,7 +60,7 @@ func Login() templ.Component {
 			templ_7745c5c3_Var2 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<section class=\"container\"><h1>Login</h1><form><input type=\"password\" name=\"password\" placeholder=\"Password\"> <small>Password is <code>password</code></small> <button type=\"submit\">Login</button></form></section>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<section class=\"container\"><h1>Login</h1><form hx-post=\"/login\"><input type=\"password\" name=\"password\" placeholder=\"Password\"> <small>Password is <code>password</code></small> <button type=\"submit\">Login</button></form></section>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

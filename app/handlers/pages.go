@@ -36,3 +36,28 @@ func (p *PageHandler) HandleGetChat() http.HandlerFunc {
 		}
 	}
 }
+
+func (p *PageHandler) HandleGetLogin() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if err := r.ParseForm(); err != nil {
+			http.Error(w, "Failed to parse form", http.StatusBadRequest)
+			return
+		}
+
+		password := r.FormValue("password")
+		if password == "" {
+			http.Error(w, "Password cannot be empty", http.StatusBadRequest)
+			return
+		}
+
+		if password != "password" {
+			http.Error(w, "Invalid password", http.StatusUnauthorized)
+			return
+		}
+
+		if err := Redirect(w, r, "/chat", http.StatusSeeOther); err != nil {
+			slog.ErrorContext(r.Context(), "error redirecting to chat", slog.String("error", err.Error()))
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		}
+	}
+}
