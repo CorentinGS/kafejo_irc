@@ -3,22 +3,25 @@ package handlers
 import (
 	"bytes"
 	"fmt"
+	"log/slog"
 	"net/http"
 	"sync"
 	"sync/atomic"
+	"time"
 
 	"github.com/corentings/kafejo-books/app/views/page"
+	"github.com/corentings/kafejo-books/domain"
 )
 
 type ChatHandler struct {
-	clients     map[string]chan string
+	clients     map[string]chan domain.Message
 	clientsLock sync.RWMutex
 	userCount   int64 // Use atomic operations for thread-safe access
 }
 
 func NewChatHandler() *ChatHandler {
 	return &ChatHandler{
-		clients: make(map[string]chan string),
+		clients: make(map[string]chan domain.Message),
 	}
 }
 
@@ -28,19 +31,36 @@ func (c *ChatHandler) HandleGetChatLive() http.HandlerFunc {
 		w.Header().Set("Cache-Control", "no-cache")
 		w.Header().Set("Connection", "keep-alive")
 
-		messageChan := make(chan string)
-		c.addClient("", messageChan)
-		defer c.removeClient("")
+		// Fetch username from secure cookie
+		var username string
+		if cookie, err := r.Cookie("username"); err == nil {
+			if err = globalSecureCookie.Decode("username", cookie.Value, &username); err != nil {
+				slog.ErrorContext(r.Context(), "Failed to decode username cookie", slog.String("error", err.Error()))
+				username = "Anonymous"
+			}
+		} else {
+			username = "Anonymous"
+		}
+
+		messageChan := make(chan domain.Message)
+		c.addClient(username, messageChan)
+		defer c.removeClient(username)
 
 		flusher, ok := w.(http.Flusher)
 		if !ok {
 			http.Error(w, "Streaming unsupported!", http.StatusInternalServerError)
 			return
 		}
+
+		// Create a ticker that ticks every 10 seconds
+		userCountTicker := time.NewTicker(10 * time.Second)
+		defer userCountTicker.Stop()
+
 		for {
 			select {
 			case message := <-messageChan:
-				messageComponent := page.Message(message)
+				// Use the username when creating the message component
+				messageComponent := page.Message(message.Author, message.Content)
 
 				// Create a buffer to render the component
 				buf := &bytes.Buffer{}
@@ -52,6 +72,25 @@ func (c *ChatHandler) HandleGetChatLive() http.HandlerFunc {
 
 				// Write the SSE formatted message
 				fmt.Fprintf(w, "event: chat\ndata: %s\n\n", buf.String())
+				flusher.Flush()
+
+			case <-userCountTicker.C:
+				// Get the current user count
+				count := atomic.LoadInt64(&c.userCount)
+
+				// Create the user count component
+				userCountComponent := page.ConnectedUsers(count)
+
+				// Render the component
+				buf := &bytes.Buffer{}
+				err := userCountComponent.Render(r.Context(), buf)
+				if err != nil {
+					slog.ErrorContext(r.Context(), "Error rendering user count", slog.String("error", err.Error()))
+					continue
+				}
+
+				// Send the user count as an SSE event
+				fmt.Fprintf(w, "event: users\ndata: %s\n\n", buf.String())
 				flusher.Flush()
 
 			case <-r.Context().Done():
@@ -68,10 +107,26 @@ func (c *ChatHandler) HandlePostChatSend() http.HandlerFunc {
 			return
 		}
 
-		message := r.FormValue("message")
-		if message == "" {
+		content := r.FormValue("message")
+		if content == "" {
 			http.Error(w, "Message cannot be empty", http.StatusBadRequest)
 			return
+		}
+
+		// Fetch username from secure cookie
+		var username string
+		if cookie, err := r.Cookie("username"); err == nil {
+			if err = globalSecureCookie.Decode("username", cookie.Value, &username); err != nil {
+				slog.ErrorContext(r.Context(), "Failed to decode username cookie", slog.String("error", err.Error()))
+				username = "Anonymous"
+			}
+		} else {
+			username = "Anonymous"
+		}
+
+		message := domain.Message{
+			Author:  username,
+			Content: content,
 		}
 
 		c.broadcastMessage(message)
@@ -84,7 +139,7 @@ func (c *ChatHandler) HandlePostChatSend() http.HandlerFunc {
 	}
 }
 
-func (c *ChatHandler) addClient(username string, messageChan chan string) {
+func (c *ChatHandler) addClient(username string, messageChan chan domain.Message) {
 	c.clientsLock.Lock()
 	defer c.clientsLock.Unlock()
 	if _, exists := c.clients[username]; !exists {
@@ -103,7 +158,7 @@ func (c *ChatHandler) removeClient(username string) {
 	}
 }
 
-func (c *ChatHandler) broadcastMessage(message string) {
+func (c *ChatHandler) broadcastMessage(message domain.Message) {
 	c.clientsLock.RLock()
 	defer c.clientsLock.RUnlock()
 	for _, ch := range c.clients {

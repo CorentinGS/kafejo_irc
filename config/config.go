@@ -16,8 +16,10 @@ type (
 
 	// App -.
 	App struct {
-		Name    string `env-required:"true" yaml:"name"    env:"APP_NAME"`
-		Version string `env-required:"true" yaml:"version" env:"APP_VERSION"`
+		Name                 string `env-required:"true" yaml:"name"    env:"APP_NAME"`
+		Version              string `env-required:"true" yaml:"version" env:"APP_VERSION"`
+		SecureCookieHashKey  string `env-required:"true" yaml:"secure_cookie_hash_key" env:"SECURE_COOKIE_HASH_KEY"`
+		SecureCookieBlockKey string `env-required:"true" yaml:"secure_cookie_block_key" env:"SECURE_COOKIE_BLOCK_KEY"`
 	}
 
 	// HTTP -.

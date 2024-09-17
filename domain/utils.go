@@ -28,6 +28,6 @@ type Nonce struct {
 }
 
 type Message struct {
-	author  string
-	content string
+	Author  string
+	Content string
 }

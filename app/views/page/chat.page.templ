@@ -5,20 +5,20 @@ import (
 	"github.com/corentings/kafejo-books/app/views/layout"
 )
 
-templ Message(message string) {
-	<p>{ templ.EscapeString(message) }</p>
+templ Message(username, message string) {
+	<p>{ username }: { templ.EscapeString(message) }</p>
 }
 
 templ App() {
-	<section class="container">
+	<section class="container" hx-ext="sse" sse-connect="/chat/live">
 		<style>
     me {
         height: 100%;
     }
     </style>
 		<h1>Kafejo Chat</h1>
-		<span hx-get="/chat/users" hx-trigger="every 2s" hx-swap="innerHTML"></span>
-		<div class="overflow-auto" hx-ext="sse" sse-connect="/chat/live" sse-swap="chat" hx-swap="beforeend scroll:bottom">
+		<span hx-get="/chat/users" hx-trigger="load" hx-swap="innerHTML"></span>
+		<div class="overflow-auto" sse-swap="chat" hx-swap="beforeend scroll:bottom">
 			<style>
         me {
             height: 75vh;
@@ -30,7 +30,7 @@ templ App() {
 }
 
 templ ConnectedUsers(number int64) {
-	<span>{ fmt.Sprintf("%d Users connected", number) }</span>
+	<span sse-swap="users" hx-swap="innerHTML">{ fmt.Sprintf("%d Users connected", number) }</span>
 }
 
 templ ChatInput() {

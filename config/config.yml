@@ -1,6 +1,8 @@
 app:
   name: kafejo-books
   version: 0.0.1
+  secure_cookie_hash_key: "your-hash-key"
+  secure_cookie_block_key: "your-block-keyyy"
 http:
   port: 1815
   host: localhost

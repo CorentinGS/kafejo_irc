@@ -14,6 +14,7 @@ import (
 
 // RegisterRoutes registers the API routes for the repertoire service.
 func RegisterRoutes(s *Server) {
+	handlers.InitSecureCookie([]byte(s.Config.App.SecureCookieHashKey), []byte(s.Config.App.SecureCookieBlockKey))
 	pageHandler := handlers.NewPageHandler()
 	chatHandler := handlers.NewChatHandler()
 
